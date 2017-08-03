@@ -1,0 +1,80 @@
+version: '3.3'
+
+services:
+
+  elasticsearch:
+    image: swarm.ltn.columbiagroup.com:5555/elasticsearch
+    ulimits:
+      memlock: -1
+      nofile:
+        hard: 65536
+        soft: 65536
+      nproc: 65538
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx1g -Xms1g"
+      cluster.name: "elk-cluster"
+      discovery.type: zen
+      discovery.zen.ping.unicast.hosts: elasticsearch
+      network.host: 0.0.0.0
+    deploy:
+      mode: global
+      endpoint_mode: dnsrr
+      resources:
+        limits:
+          memory: 8192M
+        reservations:
+          memory: 8192M
+    networks:
+      - esnet
+
+  logstash:
+    #build: logstash/
+    #image: docker.elastic.co/logstash/logstash:5.4.1
+    image: swarm.ltn.columbiagroup.com:5555/logstash
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "5002:5002"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - esnet
+    depends_on:
+      - elasticsearch
+    deploy:
+      mode: global
+      #endpoint_mode: dnsrr
+
+  kibana:
+    #build: kibana/
+    #image: docker.elastic.co/kibana/kibana:5.4.1
+    image: swarm.ltn.columbiagroup.com:5555/kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - esnet
+    depends_on:
+      - elasticsearch
+    deploy:
+      mode: global
+      #endpoint_mode: dnsrr
+
+  cerebro:
+    image: dylanmei/cerebro
+    command: bin/cerebro -Dhosts.0.host=http://elasticsearch:9200
+    ports:
+      - "9001:9000"
+    networks:
+      - esnet
+    deploy:
+      mode: global
+      #endpoint_mode: dnsrr
+
+networks:
+  esnet:
+    driver: overlay
+    attachable: true
+volumes:
+  esdata:
