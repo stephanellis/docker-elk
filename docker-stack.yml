@@ -13,7 +13,7 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
     environment:
-      ES_JAVA_OPTS: "-Xmx1g -Xms1g"
+      ES_JAVA_OPTS: "-Xmx8g -Xms8g"
       cluster.name: "elk-cluster"
       discovery.type: zen
       discovery.zen.ping.unicast.hosts: elasticsearch
@@ -23,9 +23,9 @@ services:
       endpoint_mode: dnsrr
       resources:
         limits:
-          memory: 8192M
+          memory: 16G
         reservations:
-          memory: 8192M
+          memory: 16G
     networks:
       - esnet
 
