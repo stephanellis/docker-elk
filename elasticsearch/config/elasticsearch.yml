@@ -26,3 +26,5 @@ xpack.graph.enabled: false
 xpack.watcher.enabled: false
 
 #setup by stephan
+thread_pool.search.queue_size: 10000
+#bootstrap.memory_lock: true
