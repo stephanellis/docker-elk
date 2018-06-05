@@ -1,0 +1,3 @@
+#! /bin/bash
+
+python lastlogon.py $1
